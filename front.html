@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Book Entry</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .sidebar {
+        height: 100vh;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #2c6e49;
+        padding-top: 20px;
+        text-align: center;
+        color: white;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      }
+      .sidebar h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .sidebar a {
+        display: block;
+        color: white;
+        padding: 15px 0;
+        text-decoration: none;
+        font-size: 18px;
+        transition: background-color 0.3s;
+      }
+      .sidebar a:hover {
+        background-color: #1f4b33;
+      }
+      .active {
+        background-color: #1f4b33; /* Change to desired active color */
+        font-weight: bold;
+      }
+      .submenu {
+        display: none;
+        padding-left: 20px;
+        margin-top: 10px;
+      }
+      .submenu a {
+        font-size: 16px;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 20px;
+      }
+      h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+      form {
+        display: none;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      label, input {
+        margin: 10px 0;
+        display: block;
+        width: 100%;
+        font-size: 16px;
+      }
+      input[type="number"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #statusMessage {
+        margin-top: 15px;
+        font-size: 16px;
+        color: #2c6e49;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+      <h2>Bill Book</h2>
+      <a href="#" onclick="toggleSubmenu('bricks')">Bricks</a>
+      <div id="bricksSubmenu" class="submenu">
+        <a href="#" onclick="showForm('bricks', 'unit 1')">Unit 1</a>
+        <a href="#" onclick="showForm('bricks', 'unit 2')">Unit 2</a>
+        <a href="#" onclick="showForm('bricks', 'hollow block')">Hollow Block</a>
+      </div>
+      <a href="#" onclick="toggleSubmenu('cement')">Cement</a>
+      <div id="cementSubmenu" class="submenu">
+        <a href="#" onclick="showForm('cement', 'unit 1')">Unit 1</a>
+        <a href="#" onclick="showForm('cement', 'unit 2')">Unit 2</a>
+        <a href="#" onclick="showForm('cement', 'hollow block')">Hollow Block</a>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content">
+      <h2>Bill Book Entry</h2>
+      <p>Select an item from the menu to make an entry.</p>
+      
+      <!-- Entry Form -->
+      <form id="entryForm">
+        <h3 id="formHeader">Entry</h3>
+        
+        <label for="pallets">No of Pallet:</label>
+        <input type="number" id="pallets" name="pallets" min="0" required>
+        
+        <label for="mixing">No of Mixing:</label>
+        <input type="number" id="mixing" name="mixing" min="0" required>
+        
+        <label for="cementPacksUsed">No of Cement Pack Used:</label>
+        <input type="number" id="cementPacksUsed" name="cementPacksUsed" min="0" required>
+        
+        <label for="newCementPacks">No of New Cement Pack:</label>
+        <input type="number" id="newCementPacks" name="newCementPacks" min="0" required>
+        
+        <label for="bricksOut">No of Brick Out:</label>
+        <input type="number" id="bricksOut" name="bricksOut" min="0" required>
+
+        <button type="button" onclick="submitEntry()">Submit Entry</button>
+      </form>
+      
+      <p id="statusMessage"></p>
+    </div>
+
+    <script>
+      let currentItem = '';
+      let currentUnit = '';
+      let currentActiveLink = null; // To keep track of the currently active link
+
+      function toggleSubmenu(item) {
+        const submenu = document.getElementById(item + 'Submenu');
+        submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+
+        // Remove active class from all links
+        const links = document.querySelectorAll('.sidebar a');
+        links.forEach(link => link.classList.remove('active'));
+
+        // Add active class to the clicked menu item
+        if (currentActiveLink) {
+          currentActiveLink.classList.remove('active');
+        }
+        currentActiveLink = document.querySelector(`.sidebar a[href="#"][onclick="toggleSubmenu('${item}')"]`);
+        currentActiveLink.classList.add('active');
+      }
+
+      function showForm(item, unit) {
+        currentItem = item;
+        currentUnit = unit;
+
+        const form = document.getElementById('entryForm');
+        const formHeader = document.getElementById('formHeader');
+
+        formHeader.textContent = `Entry for ${item.charAt(0).toUpperCase() + item.slice(1)} - ${unit.charAt(0).toUpperCase() + unit.slice(1)}`;
+        form.style.display = 'block';
+
+        // Remove active class from all links
+        const links = document.querySelectorAll('.sidebar a');
+        links.forEach(link => link.classList.remove('active'));
+
+        // Add active class to the clicked submenu item
+        const submenuLink = document.querySelector(`.sidebar a[href="#"][onclick="showForm('${item}', '${unit}')"]`);
+        submenuLink.classList.add('active');
+
+        document.getElementById('statusMessage').textContent = ''; // Clear status message
+      }
+
+      function submitEntry() {
+        const pallets = document.getElementById('pallets').value;
+        const mixing = document.getElementById('mixing').value;
+        const cementPacksUsed = document.getElementById('cementPacksUsed').value;
+        const newCementPacks = document.getElementById('newCementPacks').value;
+        const bricksOut = document.getElementById('bricksOut').value;
+
+        // Basic validation
+        if (pallets < 0 || mixing < 0 || cementPacksUsed < 0 || newCementPacks < 0 || bricksOut < 0) {
+          document.getElementById('statusMessage').textContent = 'All values must be non-negative.';
+          return;
+        }
+
+        google.script.run.withSuccessHandler(updateStatus).saveEntry(currentItem, currentUnit, pallets, mixing, cementPacksUsed, newCementPacks, bricksOut);
+      }
+      
+      function updateStatus(message) {
+        document.getElementById('statusMessage').textContent = message;
+        document.getElementById('entryForm').reset();
+      }
+    </script>
+  </body>
+</html>
